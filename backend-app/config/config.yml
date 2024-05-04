@@ -1,0 +1,4 @@
+db:
+  user: app
+  pass: ppa
+  databaseName: loginSystem
