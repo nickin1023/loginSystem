@@ -1,15 +1,29 @@
 package main
 
 import (
-	"backend-app/util"
+	"backend-app/config"
+	"backend-app/router"
+	"backend-app/utils/handler"
+	"log/slog"
+	"os"
 )
 
 func main() {
-	// http.HandleFunc("/", echoHello)
-	// http.ListenAndServe(":8000", nil)
-	util.FindAll()
-}
+	// Load Config
+	config, err := config.Init()
+	if err != nil {
+		slog.Error("Config Loading error:", err)
+		os.Exit(1)
+	}
 
-// func echoHello(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Fprintf(w, "<h1>Hello World</h1>")
-// }
+	// Establish Database Connection
+	db, err := handler.OpenDBConnection(config)
+	if err != nil {
+		slog.Error("DB connection error:", err)
+		os.Exit(1)
+	}
+	defer db.Close()
+
+	router := router.GetRouter(db)
+	router.Run(":8000")
+}

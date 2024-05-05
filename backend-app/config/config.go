@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log/slog"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -13,23 +12,22 @@ type db struct {
 	DatabaseName string `json:"databaseName" yaml:"databaseName"`
 }
 
-type config struct {
+type Config struct {
 	Db db `json:"db" yaml:"db"`
 }
 
-var Config config
-
-func init() {
+func Init() (Config, error) {
+	var config Config
 	f, err := os.Open("./config/config.yml")
 	if err != nil {
-		slog.Error("config os.Open err:", err)
-		os.Exit(1)
+		return config, err
 	}
 	defer f.Close()
 
-	err = yaml.NewDecoder(f).Decode(&Config)
+	err = yaml.NewDecoder(f).Decode(&config)
 	if err != nil {
-		slog.Error("Yaml decode error:", err)
-		os.Exit(1)
+		return config, err
 	}
+
+	return config, nil
 }
